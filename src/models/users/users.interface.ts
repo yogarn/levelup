@@ -3,6 +3,7 @@ export interface Users {
     name: string;
     username: string;
     password: string;
-    created_at: Date;
-    updated_at: Date;
+    birthDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
