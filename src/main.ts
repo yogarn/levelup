@@ -7,8 +7,9 @@ import { ResponseInterceptor } from './common/response/response.interceptor';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalFilters(new GlobalExceptionFilter(), new PrismaClientExceptionFilter())
-  app.useGlobalInterceptors(new ResponseInterceptor())
+  app.enableCors();
+  app.useGlobalFilters(new GlobalExceptionFilter(), new PrismaClientExceptionFilter());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   await app.listen(3000);
 }
