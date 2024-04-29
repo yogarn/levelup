@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Users } from './users.interface';
+import { Users } from './users.entity';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -7,14 +7,22 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
     constructor(private prisma: PrismaService) { }
+
     async findAllUsers(): Promise<Users[]> {
-        return await this.prisma.user.findMany();
+        return await this.prisma.user.findMany({
+            include: {
+                diary: true
+            }
+        });
     }
 
     async findOneUser(id: string): Promise<Users> {
         return await this.prisma.user.findFirst({
             where: {
                 id
+            },
+            include: {
+                diary: true
             }
         });
     }
@@ -23,18 +31,21 @@ export class UsersService {
         return await this.prisma.user.findFirst({
             where: {
                 username
+            },
+            include: {
+                diary: true
             }
         });
     }
 
-    async createUser(data: Prisma.UserCreateInput): Promise<Users> {
+    async createUser(data: Prisma.userCreateInput): Promise<Users> {
         data.password = await bcrypt.hash(data.password, 10);
         return await this.prisma.user.create({
             data
         });
     }
 
-    async updateUser(id: string, data: Prisma.UserUpdateInput): Promise<Users> {
+    async updateUser(id: string, data: Prisma.userUpdateInput): Promise<Users> {
         if (data.password) {
             data.password = await bcrypt.hash(data.password.toString(), 10);
         }

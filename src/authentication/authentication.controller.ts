@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Get, Param, Post, Request, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { signInDto } from './dto/sign-in.dto';
-import { Users } from 'src/models/users/users.interface';
+import { Users } from 'src/models/users/users.entity';
 import { AuthenticationGuard } from './authentication.guard';
 import { UsersService } from 'src/models/users/users.service';
 
