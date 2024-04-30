@@ -5,6 +5,7 @@ import { createDiaryDto } from './dto/create-diary.dto';
 import { AuthenticationGuard } from 'src/authentication/authentication.guard';
 import { updateDiaryDto } from './dto/update-diary.dto';
 
+@UseGuards(AuthenticationGuard)
 @Controller('diaries')
 export class DiariesController {
     constructor(private diariesService: DiariesService) { }
