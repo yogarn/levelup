@@ -11,7 +11,8 @@ export class UsersService {
     async findAllUsers(): Promise<Users[]> {
         return await this.prisma.user.findMany({
             include: {
-                diary: true
+                diary: true,
+                role: true
             }
         });
     }
@@ -22,7 +23,8 @@ export class UsersService {
                 id
             },
             include: {
-                diary: true
+                diary: true,
+                role: true
             }
         });
     }
@@ -33,7 +35,8 @@ export class UsersService {
                 username
             },
             include: {
-                diary: true
+                diary: true,
+                role: true
             }
         });
     }
@@ -41,7 +44,11 @@ export class UsersService {
     async createUser(data: Prisma.userCreateInput): Promise<Users> {
         data.password = await bcrypt.hash(data.password, 10);
         return await this.prisma.user.create({
-            data
+            data,
+            include: {
+                diary: true,
+                role: true
+            }
         });
     }
 
@@ -53,7 +60,11 @@ export class UsersService {
             where: {
                 id
             },
-            data
+            data,
+            include: {
+                diary: true,
+                role: true
+            }
         })
     }
 
@@ -61,6 +72,10 @@ export class UsersService {
         return await this.prisma.user.delete({
             where: {
                 id
+            },
+            include: {
+                diary: true,
+                role: true
             }
         })
     }

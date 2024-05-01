@@ -4,13 +4,16 @@ import { Users } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticationGuard } from 'src/authentication/authentication.guard';
+import { Roles } from 'src/models/roles/roles.decorator';
+import { RolesGuard } from '../roles/roles.guard';
 
 @Controller('users')
 export class UsersController {
     constructor(private usersService: UsersService) { }
 
-    @UseGuards(AuthenticationGuard)
     @Get()
+    @UseGuards(AuthenticationGuard, RolesGuard)
+    @Roles(['admin'])
     async findAllUsers(): Promise<Users[]> {
         return await this.usersService.findAllUsers();
     }
@@ -23,7 +26,7 @@ export class UsersController {
 
     // register new user
     @Post()
-    async createUser(@Body() data: CreateUserDto): Promise<Users> { 
+    async createUser(@Body() data: CreateUserDto): Promise<Users> {
         if (!data.name || !data.username || !data.password || !data.birthDate) {
             throw new BadRequestException('provide name, username, password, and birthDate')
         }

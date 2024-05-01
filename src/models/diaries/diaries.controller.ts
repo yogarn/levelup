@@ -4,12 +4,15 @@ import { Diaries } from './diaries.entity';
 import { createDiaryDto } from './dto/create-diary.dto';
 import { AuthenticationGuard } from 'src/authentication/authentication.guard';
 import { updateDiaryDto } from './dto/update-diary.dto';
+import { Roles } from '../roles/roles.decorator';
+import { RolesGuard } from '../roles/roles.guard';
 
-@UseGuards(AuthenticationGuard)
+@UseGuards(AuthenticationGuard, RolesGuard)
 @Controller('diaries')
 export class DiariesController {
     constructor(private diariesService: DiariesService) { }
 
+    @Roles(['admin'])
     @Get()
     async findAllDiaries(): Promise<Diaries[]> {
         return await this.diariesService.findAllDiaries();
