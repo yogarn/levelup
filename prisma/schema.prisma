@@ -19,9 +19,17 @@ model user {
   username  String    @unique @db.VarChar(255)
   password  String    @db.VarChar(255)
   birthDate DateTime  @db.Date()
+  role      role      @relation(fields: [roleId], references: [id])
+  roleId    Int       @default(1) @db.Integer
   diary     diary[]
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+}
+
+model role {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  user user[]
 }
 
 model diary {
