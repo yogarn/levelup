@@ -4,7 +4,6 @@ import { redisStore } from 'cache-manager-redis-store';
 
 export const RedisOptions: CacheModuleAsyncOptions = {
   isGlobal: true,
-  imports: [ConfigModule],
   useFactory: async (configService: ConfigService) => {
     const store = await redisStore({
       socket: {
