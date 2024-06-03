@@ -6,9 +6,10 @@ import { PrismaModule } from './database/prisma/prisma.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DiariesModule } from './models/diaries/diaries.module';
 import { RolesModule } from './models/roles/roles.module';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { RedisOptions } from './configs/redis-options.constants';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -21,6 +22,12 @@ import { RedisOptions } from './configs/redis-options.constants';
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}
