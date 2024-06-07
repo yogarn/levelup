@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { DiariesService } from './diaries.service';
 import { Diaries } from './diaries.entity';
 import { createDiaryDto } from './dto/create-diary.dto';
@@ -11,44 +23,54 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 @UseGuards(AuthenticationGuard, RolesGuard)
 @Controller('diaries')
 export class DiariesController {
-    constructor(private diariesService: DiariesService, @Inject(CACHE_MANAGER) private readonly cacheManager ) { }
+  constructor(
+    private diariesService: DiariesService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager,
+  ) {}
 
-    @Roles(['admin'])
-    @Get()
-    async findAllDiaries(): Promise<Diaries[]> {
-        return await this.diariesService.findAllDiaries();
+  @Roles(['admin'])
+  @Get()
+  async findAllDiaries(): Promise<Diaries[]> {
+    return await this.diariesService.findAllDiaries();
+  }
+
+  @Get('/:id')
+  async findDiaryById(@Param('id') id: string): Promise<Diaries> {
+    return await this.diariesService.findDiaryByid(id);
+  }
+
+  @Post()
+  @UseGuards(AuthenticationGuard)
+  async createDiary(
+    @Req() req,
+    @Body() diary: createDiaryDto,
+  ): Promise<Diaries> {
+    if (!diary.title || !diary.body) {
+      throw new BadRequestException('provide title and body');
     }
 
-    @Get('/:id')
-    async findDiaryById(@Param('id') id: string): Promise<Diaries> {
-        return await this.diariesService.findDiaryByid(id);
-    }
+    await this.cacheManager.del('/diaries');
 
-    @Post()
-    @UseGuards(AuthenticationGuard)
-    async createDiary(@Req() req, @Body() diary: createDiaryDto): Promise<Diaries> {
-        if (!diary.title || !diary.body) {
-            throw new BadRequestException('provide title and body');
-        }
+    return await this.diariesService.createDiary(req.jwt.userId, {
+      title: diary.title,
+      body: diary.body,
+      user: { connect: { id: req.jwt.userId } },
+    });
+  }
 
-        await this.cacheManager.del('/diaries');
+  @Patch('/:id')
+  async updateDiary(
+    @Param('id') id: string,
+    @Body() diary: updateDiaryDto,
+  ): Promise<Diaries> {
+    await this.cacheManager.del(`/diaries/${id}`);
+    return await this.diariesService.updateDiary(id, diary);
+  }
 
-        return await this.diariesService.createDiary(req.jwt.userId, {
-            title: diary.title,
-            body: diary.body,
-            user: { connect: { id: req.jwt.userId } },
-        })
-    }
-
-    @Patch('/:id')
-    async updateDiary(@Param('id') id: string, @Body() diary: updateDiaryDto): Promise<Diaries> {
-        await this.cacheManager.del(`/diaries/${id}`);
-        return await this.diariesService.updateDiary(id, diary);
-    }
-
-    @Delete('/:id')
-    async deleteDiary(@Param('id') id: string): Promise<Diaries> {
-        await this.cacheManager.del(`/diaries/${id}`);
-        return await this.diariesService.deleteDiary(id);
-    }
+  @Delete('/:id')
+  async deleteDiary(@Param('id') id: string): Promise<Diaries> {
+    await this.cacheManager.del('/diaries');
+    await this.cacheManager.del(`/diaries/${id}`);
+    return await this.diariesService.deleteDiary(id);
+  }
 }
