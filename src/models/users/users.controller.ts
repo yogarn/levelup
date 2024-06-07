@@ -80,7 +80,8 @@ export class UsersController {
   @UseGuards(AuthenticationGuard)
   @Delete('/:id')
   async deleteUser(@Param('id') id: string): Promise<Users> {
-    await this.cacheManager.del('/users', `/users/${id}`);
+    await this.cacheManager.del('/users');
+    await this.cacheManager.del(`/users/${id}`);
     return this.usersService.deleteUser(id);
   }
 }
